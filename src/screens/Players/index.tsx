@@ -1,7 +1,8 @@
-import { ButtonIcon } from "@components/ButtonIcon";
+import { Input } from "@components/Input";
 import { Header } from "@components/Header";
 import { Highlight } from "@components/Highlight";
-import { Input } from "@components/Input";
+import { ButtonIcon } from "@components/ButtonIcon";
+
 import { Container } from "./styles";
 
 export function Players() {
@@ -11,9 +12,10 @@ export function Players() {
 
       <Highlight
         title="Nome da turma"
-        subtitle="adicione o nome da galera e separe os times"
+        subtitle="Adicione o nome da galera e separe os times"
       />
-      <ButtonIcon />
+      <Input placeholder="Nome da pessoa"/>
+      <ButtonIcon icon="add" />
 
     </Container>
   )
