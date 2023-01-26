@@ -1,4 +1,4 @@
-import styled from "styled-components/native";
+import styled from "styled-components/native"
 import { UsersThree } from 'phosphor-react-native'
 
 export const Container = styled.View`
