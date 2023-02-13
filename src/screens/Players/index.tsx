@@ -2,6 +2,10 @@ import { useState } from "react"
 import { Alert, FlatList } from "react-native";
 import { useRoute } from '@react-navigation/native'
 
+import { PlaayerAddByGroup } from "@storage/player/playerAddByGroup";
+import { playerGetByGroupAndTeam } from "@storage/player/playerGetByGroupAndTeam";
+import { AppError } from "@utils/AppError";
+
 import { Input } from "@components/Input";
 import { Filter } from "@components/Filter";
 import { Header } from "@components/Header";
@@ -12,9 +16,8 @@ import { PlayerCard } from "@components/PlayCard";
 import { ButtonIcon } from "@components/ButtonIcon";
 
 import { Container, Form, HeaderList, NumbersOfPlayers } from "./styles";
-import { AppError } from "@utils/AppError";
-import { PlaayerAddByGroup } from "@storage/player/playerAddByGroup";
-import { playerGetByGroup } from "@storage/player/playersGetByGroup";
+import { PlayerStorageDTO } from "@storage/player/PlayerStorageDTO";
+
 
 // tipando os parametros do nome da turma da rota 
 type RouteParams = {
@@ -25,7 +28,7 @@ type RouteParams = {
 export function Players() { 
   const [ newPlayerName, setNewPlayerName] = useState('')
   const [ team, setTeam ] = useState('Time A')
-  const [ players, setPlayers ] = useState([])
+  const [ players, setPlayers ] = useState<PlayerStorageDTO[]>([])
   // 'Diego', 'Ayrton', 'Kaju', 'Raul', 'naldim', 'Dinaldo', 'Tio João', 'Fabin', 'Alex', 'Adolfo', 'Gabriel', 'Klismann', 'Marcos', 'Harley'
 
   // pegando os paramentros para o nome da turma
@@ -45,8 +48,6 @@ export function Players() {
 
     try {
       await PlaayerAddByGroup(newPlayer, group)
-      const players = await playerGetByGroup(group)
-      console.log(players)
       
     }catch(error) {
       if(error instanceof AppError){
@@ -55,6 +56,16 @@ export function Players() {
         console.log(error)
         Alert.alert('Nova pessoa', 'Não foi possível adicionar')
       }
+    }
+  }
+
+  async function fecthPlayersByTeam() {
+    try {
+      const playerByTeam = await playerGetByGroupAndTeam(group, team)
+      setPlayers(playerByTeam)
+    } catch(error) {
+      console.log(error)
+      Alert.alert('Pessoas', 'Não foi possível carregar as pessoas do time selecionado.')
     }
   }
 
