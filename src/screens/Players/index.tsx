@@ -4,6 +4,8 @@ import { useRoute } from '@react-navigation/native'
 
 import { PlayerAddByGroup } from "@storage/player/playerAddByGroup";
 import { playerGetByGroupAndTeam } from "@storage/player/playerGetByGroupAndTeam";
+import { playerRemoveByGroup } from "@storage/player/playerRemoveByGroup";
+
 import { AppError } from "@utils/AppError";
 
 import { Input } from "@components/Input";
@@ -17,6 +19,7 @@ import { ButtonIcon } from "@components/ButtonIcon";
 
 import { Container, Form, HeaderList, NumbersOfPlayers } from "./styles";
 import { PlayerStorageDTO } from "@storage/player/PlayerStorageDTO";
+
 
 
 // tipando os parametros do nome da turma da rota 
@@ -73,6 +76,17 @@ export function Players() {
     } catch(error) {
       console.log(error)
       Alert.alert('Pessoas', 'Não foi possível carregar as pessoas do time selecionado.')
+    }
+  }
+
+  async function handlePlayerRemove(playerName: string) {
+    try {
+      await playerRemoveByGroup(playerName, group)
+      fecthPlayersByTeam()
+
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Remover pessoa', 'Não foi possível remover essa pessoa.')
     }
   }
 
@@ -134,7 +148,7 @@ export function Players() {
         renderItem={({ item }) => (
           <PlayerCard
             name={item.name}
-            onRemove={() => { }}
+            onRemove={() => handlePlayerRemove(item.name)}
           />
         )}
         // mostrando mensagem quando nao tem nenhum jogador
