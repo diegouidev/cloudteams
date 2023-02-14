@@ -1,8 +1,8 @@
-import { useState } from "react"
-import { Alert, FlatList } from "react-native";
+import { useState, useEffect, useRef } from "react"
+import { Alert, FlatList, TextInput } from "react-native";
 import { useRoute } from '@react-navigation/native'
 
-import { PlaayerAddByGroup } from "@storage/player/playerAddByGroup";
+import { PlayerAddByGroup } from "@storage/player/playerAddByGroup";
 import { playerGetByGroupAndTeam } from "@storage/player/playerGetByGroupAndTeam";
 import { AppError } from "@utils/AppError";
 
@@ -35,6 +35,8 @@ export function Players() {
   const route = useRoute()
   const { group } = route.params as RouteParams
 
+  const newPlayerNameInputRef = useRef<TextInput>(null)
+
   // identifica se o campo esta vazio ou não e informa a mensagem de error
   async function handlePlayer() {
     if(newPlayerName.trim().length === 0) {
@@ -47,7 +49,12 @@ export function Players() {
     }
 
     try {
-      await PlaayerAddByGroup(newPlayer, group)
+      await PlayerAddByGroup(newPlayer, group)
+      //tirando o foco do input e teclado
+      newPlayerNameInputRef.current?.blur()
+      //limpando o input
+      setNewPlayerName('')
+      fecthPlayersByTeam()
       
     }catch(error) {
       if(error instanceof AppError){
@@ -69,6 +76,10 @@ export function Players() {
     }
   }
 
+  useEffect(() => {
+    fecthPlayersByTeam()
+  }, [team])
+
   return (
     <Container>
       <Header showBackButton />
@@ -81,9 +92,13 @@ export function Players() {
 
       <Form>
         <Input
-        onChangeText={setNewPlayerName}
+          inputRef={newPlayerNameInputRef}
+          onChangeText={setNewPlayerName}
+          value={newPlayerName}
           placeholder="Nome da pessoa"
           autoCorrect={false}
+          onSubmitEditing={handlePlayer}
+          returnKeyType="done"
         />
         <ButtonIcon
           icon="add"
@@ -115,10 +130,10 @@ export function Players() {
       {/* rendeziando os participantes */}
       <FlatList
         data={players}
-        keyExtractor={item => item}
+        keyExtractor={item => item.name}
         renderItem={({ item }) => (
           <PlayerCard
-            name={item}
+            name={item.name}
             onRemove={() => { }}
           />
         )}

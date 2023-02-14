@@ -6,7 +6,7 @@ import { playerGetByGroup } from './playersGetByGroup'
 
 import { PlayerStorageDTO } from './PlayerStorageDTO'
 
-export async function PlaayerAddByGroup(newPlayer: PlayerStorageDTO, group: string){
+export async function PlayerAddByGroup(newPlayer: PlayerStorageDTO, group: string){
   try {
     const storagePlayers = await playerGetByGroup(group)
 
