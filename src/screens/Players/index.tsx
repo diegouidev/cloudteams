@@ -12,6 +12,7 @@ import { Input } from "@components/Input";
 import { Filter } from "@components/Filter";
 import { Header } from "@components/Header";
 import { Button } from "@components/Button";
+import { Loading } from "@components/Loading";
 import { ListEmpty } from "@components/ListEmpty";
 import { Highlight } from "@components/Highlight";
 import { PlayerCard } from "@components/PlayCard";
@@ -29,7 +30,8 @@ type RouteParams = {
 }
 
 
-export function Players() { 
+export function Players() {
+  const [ isLoading, setIsLoading ] = useState(true)
   const [ newPlayerName, setNewPlayerName] = useState('')
   const [ team, setTeam ] = useState('Time A')
   const [ players, setPlayers ] = useState<PlayerStorageDTO[]>([])
@@ -73,11 +75,16 @@ export function Players() {
 
   async function fecthPlayersByTeam() {
     try {
+      setIsLoading(false)
+
       const playerByTeam = await playerGetByGroupAndTeam(group, team)
       setPlayers(playerByTeam)
+      
     } catch(error) {
       console.log(error)
       Alert.alert('Pessoas', 'Não foi possível carregar as pessoas do time selecionado.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -164,30 +171,32 @@ export function Players() {
         </NumbersOfPlayers>
       </HeaderList>
 
-      {/* rendeziando os participantes */}
-      <FlatList
-        data={players}
-        keyExtractor={item => item.name}
-        renderItem={({ item }) => (
-          <PlayerCard
-            name={item.name}
-            onRemove={() => handlePlayerRemove(item.name)}
+      {
+        isLoading ? <Loading /> :
+          <FlatList
+            data={players}
+            keyExtractor={item => item.name}
+            renderItem={({ item }) => (
+              <PlayerCard
+                name={item.name}
+                onRemove={() => handlePlayerRemove(item.name)}
+              />
+            )}
+            // mostrando mensagem quando nao tem nenhum jogador
+            ListEmptyComponent={() => (
+              <ListEmpty
+                message="Não há pessoas nesse time."
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+            // estilo condicional para aplicar padding quando tiver jogadores
+            // e deixar a mensagem no centro da tela
+            contentContainerStyle={[
+              { paddingBottom: 100 },
+              players.length === 0 && { flex: 1 }
+            ]}
           />
-        )}
-        // mostrando mensagem quando nao tem nenhum jogador
-        ListEmptyComponent={() => (
-          <ListEmpty
-            message="Não há pessoas nesse time."
-          />
-        )}
-        showsVerticalScrollIndicator={false}
-        // estilo condicional para aplicar padding quando tiver jogadores
-        // e deixar a mensagem no centro da tela
-        contentContainerStyle={[
-          { paddingBottom: 100 },
-          players.length === 0 && { flex: 1 }
-        ]}
-      />
+      }
 
       <Button
         title="Remover turma"
